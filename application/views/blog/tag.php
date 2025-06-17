@@ -1,57 +1,51 @@
-<div class="container modern-blog-container mt-5 mb-5">
-    <div class="row">
-        <div class="col-md-8">
-            <h1 class="mb-5 display-3 fw-bold text-dark text-center text-md-start animate__animated animate__fadeInDown">Explore Our Latest Insights</h1>
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 
-            <div class="card search-card shadow-lg mb-5 border-0 rounded-5 animate__animated animate__fadeInUp">
-                <div class="card-body p-4 p-lg-5">
-                    <form action="<?= site_url('blog/search') ?>" method="get" class="form-inline">
-                        <div class="input-group input-group-lg border border-3 border-primary rounded-pill overflow-hidden shadow-sm">
-                            <input type="text" name="q" class="form-control border-0 ps-4 ps-lg-5 py-3" placeholder="Search for articles, topics..." required aria-label="Search posts">
-                            <button class="btn btn-primary px-4 px-lg-5 py-3 fw-bold text-uppercase search-btn" type="submit">
-                                <i class="fas fa-search me-2"></i> Search
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<div class="container modern-tag-container mt-5 mb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <h1 class="mb-5 display-3 fw-bold text-dark text-center text-md-start animate__animated animate__fadeInDown">Tag: <span class="text-primary"><?= html_escape($tag->name) ?></span></h1>
 
             <?php if (empty($posts)): ?>
                 <div class="alert alert-info text-center py-5 rounded-4 shadow-sm animate__animated animate__fadeIn">
-                    <h4 class="alert-heading display-5 fw-bold mb-3">Oops! No posts found.</h4>
-                    <p class="lead mb-0">It seems your search didn't return any results. Try refining your query or check out our popular categories.</p>
+                    <h4 class="alert-heading display-5 fw-bold mb-3">No posts found!</h4>
+                    <p class="lead mb-0">It looks like there are no blog posts associated with this tag yet. Check back soon!</p>
                 </div>
             <?php else: ?>
                 <div class="row row-cols-1 g-5">
                     <?php foreach ($posts as $index => $post): ?>
                         <div class="col animate__animated animate__fadeInUp animate__delay-<?= $index * 0.1 ?>s">
-                            <div class="card h-100 shadow-lg border-0 rounded-5 blog-post-card <?php if ($index % 2 != 0) echo 'blog-post-card-alt'; ?>">
+                            <div class="card h-100 shadow-lg border-0 rounded-5 blog-post-card">
                                 <?php if ($post->image_path): ?>
                                     <div class="post-image-wrapper">
-                                        <img src="<?= base_url($post->image_path) ?>" class="card-img-top blog-card-img rounded-top-5" alt="<?= $post->title ?>">
+                                        <img src="<?= base_url($post->image_path) ?>" class="card-img-top blog-card-img rounded-top-5" alt="<?= html_escape($post->title) ?>">
                                         <div class="image-overlay rounded-top-5"></div>
                                     </div>
                                 <?php endif; ?>
+
                                 <div class="card-body d-flex flex-column p-4 p-lg-5">
                                     <h2 class="card-title h3 mb-3 fw-bold text-dark post-title">
-                                        <a href="<?= site_url('blog/view/'.$post->slug) ?>" class="text-decoration-none text-dark hover-accent stretched-link"><?= $post->title ?></a>
+                                        <a href="<?= site_url('blog/view/' . $post->slug) ?>" class="text-decoration-none text-dark hover-accent stretched-link">
+                                            <?= html_escape($post->title) ?>
+                                        </a>
                                     </h2>
+
                                     <div class="text-muted small mb-3 post-meta d-flex flex-wrap align-items-center">
-                                        <span class="me-3 mb-2"><i class="fas fa-user-circle me-1 text-primary"></i> <?= $post->author ?></span>
-                                        <?php if ($post->category_name): ?>
-                                            <span class="me-3 mb-2"><i class="fas fa-folder-open me-1 text-primary"></i> <a href="<?= site_url('blog/category/'.$post->category_slug) ?>" class="text-decoration-none text-muted hover-accent"><?= $post->category_name ?></a></span>
+                                        <span class="me-3 mb-2"><i class="fas fa-calendar-alt me-1 text-primary"></i> <?= date('F j, Y', strtotime($post->created_at)) ?></span>
+                                        <?php if ($post->category_id): ?>
+                                            <span class="mb-2"><i class="fas fa-folder-open me-1 text-primary"></i>
+                                                <a href="<?= site_url('blog/category/' . $post->category_slug) ?>" class="text-decoration-none text-muted hover-accent">
+                                                    <?= html_escape($post->category_name) ?>
+                                                </a>
+                                            </span>
                                         <?php endif; ?>
-                                        <span class="mb-2"><i class="fas fa-calendar-alt me-1 text-primary"></i> <?= date('F j, Y', strtotime($post->created_at)) ?></span>
                                     </div>
 
-                                    <?php if ($post->excerpt): ?>
-                                        <p class="card-text text-secondary lead-sm mb-4 post-excerpt"><?= $post->excerpt ?></p>
-                                    <?php else: ?>
-                                        <p class="card-text text-secondary lead-sm mb-4 post-excerpt"><?= character_limiter(strip_tags($post->content), 200) ?></p>
-                                    <?php endif; ?>
+                                    <p class="card-text post-excerpt text-secondary lead-sm mb-4">
+                                        <?= $post->excerpt ? html_escape($post->excerpt) : character_limiter(strip_tags($post->content), 200) ?>
+                                    </p>
 
                                     <div class="mt-auto">
-                                        <a href="<?= site_url('blog/view/'.$post->slug) ?>" class="btn btn-outline-primary btn-lg rounded-pill px-5 py-3 fw-semibold text-uppercase read-more-btn">
+                                        <a href="<?= site_url('blog/view/' . $post->slug) ?>" class="btn btn-outline-primary btn-lg rounded-pill px-5 py-3 fw-semibold text-uppercase read-more-btn">
                                             Read More <i class="fas fa-arrow-right ms-2"></i>
                                         </a>
                                     </div>
@@ -61,41 +55,45 @@
                     <?php endforeach; ?>
                 </div>
 
-                <div class="d-flex justify-content-center mt-5 pt-4 animate__animated animate__fadeInUp">
-                    <?= $pagination_links ?>
-                </div>
+                <?php if ($pagination_links): ?>
+                    <div class="d-flex justify-content-center mt-5 pt-4 animate__animated animate__fadeInUp">
+                        <?= $pagination_links ?>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="card shadow-lg mb-4 border-0 rounded-5 animate__animated animate__fadeInRight animate__delay-0.2s">
                 <div class="card-header bg-primary text-white fw-bold fs-5 p-3 rounded-top-5 text-uppercase">Categories</div>
                 <div class="card-body p-4 p-lg-4">
                     <ul class="list-group list-group-flush category-list">
-                        <?php foreach ($categories as $category): ?>
+                        <?php foreach ($categories as $category_item): ?>
                             <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
-                                <a href="<?= site_url('blog/category/'.$category->slug) ?>" class="text-decoration-none text-dark hover-accent d-flex align-items-center fw-medium">
-                                    <i class="fas fa-folder me-3 text-primary fa-lg category-icon"></i> <?= $category->name ?>
+                                <a href="<?= site_url('blog/category/' . $category_item->slug) ?>" class="text-decoration-none text-dark hover-accent d-flex align-items-center fw-medium">
+                                    <i class="fas fa-folder me-3 text-primary fa-lg category-icon"></i> <?= html_escape($category_item->name) ?>
                                 </a>
-                                <span class="badge bg-primary rounded-pill fw-normal category-badge"><?= $category->post_count ?></span>
+                                <span class="badge bg-primary rounded-pill fw-normal category-badge"><?= $category_item->post_count ?></span>
                             </li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
             </div>
 
-            <div class="card shadow-lg border-0 rounded-5 animate__animated animate__fadeInRight animate__delay-0.4s">
-                <div class="card-header bg-primary text-white fw-bold fs-5 p-3 rounded-top-5 text-uppercase">Popular Tags</div>
-                <div class="card-body p-4 p-lg-4">
-                    <div class="d-flex flex-wrap tag-cloud-modern">
-                        <?php foreach ($popular_tags as $tag): ?>
-                            <a href="<?= site_url('blog/tag/'.$tag->slug) ?>" class="tag-modern bg-light text-primary rounded-pill px-3 py-2 me-2 mb-2 text-decoration-none d-flex align-items-center border border-primary fw-medium">
-                                <?= $tag->name ?> <span class="badge bg-primary ms-2 rounded-pill tag-count-badge"><?= $tag->post_count ?></span>
-                            </a>
-                        <?php endforeach; ?>
+            <?php if (!empty($popular_tags)): ?>
+                <div class="card shadow-lg border-0 rounded-5 animate__animated animate__fadeInRight animate__delay-0.4s">
+                    <div class="card-header bg-primary text-white fw-bold fs-5 p-3 rounded-top-5 text-uppercase">Popular Tags</div>
+                    <div class="card-body p-4 p-lg-4">
+                        <div class="d-flex flex-wrap tag-cloud-modern">
+                            <?php foreach ($popular_tags as $ptag): ?>
+                                <a href="<?= site_url('blog/tag/' . $ptag->slug) ?>" class="tag-modern bg-light text-primary rounded-pill px-3 py-2 me-2 mb-2 text-decoration-none d-flex align-items-center border border-primary fw-medium <?= ($ptag->id === $tag->id) ? 'active-tag-link' : '' ?>">
+                                    <?= html_escape($ptag->name) ?> <span class="badge bg-primary ms-2 rounded-pill tag-count-badge"><?= $ptag->post_count ?></span>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -130,7 +128,7 @@
         line-height: 1.3;
     }
 
-    /* General Card Styling */
+    /* General Card Styling (for main content and sidebar) */
     .card {
         background-color: var(--card-bg);
         border: none;
@@ -140,7 +138,7 @@
         overflow: hidden;
     }
 
-    /* Blog Post Card Specifics */
+    /* Blog Post Card Specifics (for individual posts in the tag list) */
     .blog-post-card {
         display: flex;
         flex-direction: column;
@@ -158,7 +156,7 @@
     }
 
     .blog-card-img {
-        height: 350px; /* Taller images for stronger visual impact */
+        height: 300px; /* Adjust height for tag list images */
         object-fit: cover;
         width: 100%;
         display: block;
@@ -191,6 +189,7 @@
 
     .post-title a {
         transition: color 0.3s ease;
+        font-family: 'Playfair Display', serif; /* Ensure post titles use Playfair Display */
     }
 
     .post-title a:hover {
@@ -213,48 +212,17 @@
         margin-bottom: 2rem;
     }
 
-    /* Search Bar Styling */
-    .search-card {
-        background-color: var(--primary-color); /* Darker background for search card */
-        color: white;
-        padding: 2rem;
-        border-radius: 1.8rem !important;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-    }
-
-    .search-card .form-control {
-        background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent input */
+    /* Tag Page Header */
+    .modern-tag-container h1 {
+        font-family: 'Playfair Display', serif;
         color: var(--text-dark);
-        border: none;
-        padding: 0.85rem 1.5rem;
-        font-size: 1.1rem;
-        transition: background-color 0.3s ease;
+        margin-bottom: 3rem !important;
+    }
+    .modern-tag-container h1 .text-primary {
+        color: var(--primary-color) !important;
     }
 
-    .search-card .form-control::placeholder {
-        color: #888;
-    }
-
-    .search-card .form-control:focus {
-        background-color: white;
-        box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.3);
-    }
-
-    .search-btn {
-        background-color: var(--secondary-color) !important; /* Accent color for search button */
-        border-color: var(--secondary-color) !important;
-        color: white;
-        font-size: 1.1rem;
-        letter-spacing: 0.05em;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    .search-btn:hover {
-        background-color: #217a6f !important; /* Darker accent on hover */
-        transform: translateY(-2px);
-    }
-
-    /* Categories & Tags Headers */
+    /* Sidebar Categories & Tags Headers */
     .card-header {
         background-color: var(--primary-color) !important;
         color: white;
@@ -265,7 +233,7 @@
         border-radius: 1.5rem 1.5rem 0 0 !important;
     }
 
-    /* Category List */
+    /* Category List in Sidebar */
     .category-list .list-group-item {
         border-left: 5px solid transparent;
         transition: all 0.2s ease-out;
@@ -295,7 +263,7 @@
         padding: .5em .7em;
     }
 
-    /* Tag Cloud */
+    /* Tag Cloud in Sidebar */
     .tag-cloud-modern .tag-modern {
         background-color: var(--background-light) !important;
         color: var(--primary-color) !important;
@@ -314,17 +282,28 @@
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
 
-    .tag-cloud-modern .tag-modern .tag-count-badge {
+    .tag-cloud-modern .tag-modern .badge { /* Specific for sidebar tag counts */
         background-color: rgba(255, 255, 255, 0.9);
         color: var(--primary-color) !important;
         font-weight: 700;
         padding: 0.3em 0.6em;
     }
 
-    .tag-cloud-modern .tag-modern:hover .tag-count-badge {
+    .tag-cloud-modern .tag-modern:hover .badge { /* Specific for sidebar tag counts */
         background-color: var(--secondary-color) !important;
         color: white !important;
     }
+    
+    /* Highlight active tag in sidebar */
+    .tag-cloud-modern .tag-modern.active-tag-link {
+        background-color: var(--primary-color) !important;
+        color: white !important;
+    }
+    .tag-cloud-modern .tag-modern.active-tag-link .tag-count-badge {
+        background-color: var(--secondary-color) !important;
+        color: white !important;
+    }
+
 
     /* Read More Button */
     .read-more-btn {
@@ -401,24 +380,19 @@
         .card-body {
             padding: 1.5rem !important;
         }
-        .search-card .form-control {
-            font-size: 1rem;
-            padding: 0.75rem 1rem;
-        }
-        .search-btn {
-            font-size: 1rem;
-            padding: 0.75rem 1.5rem;
-        }
-        .read-more-btn {
-            padding: 0.75rem 1.5rem;
-            font-size: 0.9rem;
+        .post-title {
+            font-size: 1.5rem;
         }
         .post-meta span {
             font-size: 0.85rem;
             margin-bottom: 0.25rem;
         }
-        .post-title {
-            font-size: 1.5rem;
+        .post-excerpt {
+            font-size: 0.95rem;
+        }
+        .read-more-btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
         }
     }
 </style>

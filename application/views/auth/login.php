@@ -244,55 +244,37 @@
                 <h4 class="mb-4">Login to Your Account</h4>
             </div>
 
-            <?php if($this->session->flashdata('error')): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <?= $this->session->flashdata('error'); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php endif; ?>
-            
-            <?php if($this->session->flashdata('success')): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>
-                    <?= $this->session->flashdata('success'); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php endif; ?>
-
-            <?php echo validation_errors('<div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="fas fa-exclamation-triangle me-2"></i>', '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'); ?>
-            
-            <?php echo form_open('Auth/login', ['class' => 'user']); ?>
-                <div class="form-group mb-4">
+            <form method="post" action="<?= base_url('Auth/login'); ?>" class="user">
+                <div class="mb-4">
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-user"></i></span>
-                        <input type="text" name="username" id="username" class="form-control form-control-lg-custom" placeholder="Enter Username..." value="<?php echo set_value('username'); ?>" required>
+                        <input type="text" name="username" class="form-control form-control-lg-custom" placeholder="Username" value="<?= set_value('username'); ?>" required>
                     </div>
                 </div>
-                <div class="form-group mb-4">
+                <div class="mb-4">
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        <input type="password" name="password" id="password" class="form-control form-control-lg-custom" placeholder="Password" required>
+                        <input type="password" name="password" class="form-control form-control-lg-custom" placeholder="Password" required>
                     </div>
                 </div>
-                <div class="form-group mb-4">
+                <div class="mb-4">
                     <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="remember">
-                        <label class="form-check-label" for="remember">Remember Me</label>
+                        <input class="form-check-input" type="checkbox" value="" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">
+                            Remember me
+                        </label>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary-custom btn-block w-100">
+                <button type="submit" class="btn btn-primary btn-lg w-100 btn-primary-custom mb-4">
                     <i class="fas fa-sign-in-alt me-2"></i> Login
                 </button>
-            <?php echo form_close(); ?>
-            
-            <hr class="my-4">
-            <div class="text-center mb-3">
-                <a class="small" href="#">Forgot Password?</a>
-            </div>
-            <div class="text-center">
-                <a class="small" href="<?php echo base_url('Auth/register'); ?>">Create an Account!</a>
-            </div>
+                <div class="text-center">
+                    <a class="small" href="<?= base_url('Auth/forgot_password'); ?>">Forgot Password?</a>
+                </div>
+                <div class="text-center mt-2">
+                    <a class="small" href="<?= base_url('Auth/register'); ?>">Create an Account!</a>
+                </div>
+            </form>
         </div>
     </div>
 

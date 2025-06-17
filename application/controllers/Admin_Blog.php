@@ -332,7 +332,7 @@ class Admin_Blog extends CI_Controller {
         }
         
         $data = [
-            'categories' => $this->Category_model->get_categories_with_post_counts(),
+            'categories' => $this->Category_model->get_categories_with_post_count(),
             'title' => 'Manage Categories'
         ];
         

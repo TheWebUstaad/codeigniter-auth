@@ -18,7 +18,19 @@ class Dashboard extends CI_Controller {
 
     public function index() {
         $data['title'] = 'Dashboard';
-        $data['user_info'] = $this->session->userdata(); // Pass user session data to view
+        
+        // Get complete user info including role
+        $user_id = $this->session->userdata('user_id');
+        $user = $this->User_model->get_user_by_id($user_id);
+        
+        // Prepare user info for the view
+        $data['user_info'] = array(
+            'user_id' => $user_id,
+            'username' => $this->session->userdata('username'),
+            'role_id' => $this->session->userdata('role_id'),
+            'role_name' => $user->role_name,
+            'permissions' => $this->session->userdata('permissions')
+        );
         
         // Analytics data for dashboard
         $data['analytics'] = $this->get_analytics_data();

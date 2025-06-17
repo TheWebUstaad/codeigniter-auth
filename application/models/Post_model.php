@@ -7,13 +7,16 @@ class Post_model extends CI_Model {
         parent::__construct();
     }
 
-    public function get_all_posts($limit = NULL, $offset = NULL, $filters = array()) {
-        $this->db->select('p.*, u.username as author, c.name as category_name, c.slug as category_slug');
+    public function get_all_posts($limit = NULL, $offset = NULL, $filters = []) {
+        // Base query
+        $this->db->select('p.*, c.name as category_name, c.slug as category_slug, u.username as author, GROUP_CONCAT(t.name) as tags');
         $this->db->from('posts p');
-        $this->db->join('users u', 'u.id = p.user_id');
         $this->db->join('categories c', 'c.id = p.category_id', 'left');
+        $this->db->join('users u', 'u.id = p.user_id', 'left');
+        $this->db->join('post_tags pt', 'pt.post_id = p.id', 'left');
+        $this->db->join('tags t', 't.id = pt.tag_id', 'left');
         
-        // Apply filters if provided
+        // Apply filters
         if (!empty($filters)) {
             if (isset($filters['status'])) {
                 $this->db->where('p.status', $filters['status']);
@@ -21,18 +24,21 @@ class Post_model extends CI_Model {
             if (isset($filters['category_id'])) {
                 $this->db->where('p.category_id', $filters['category_id']);
             }
-            if (isset($filters['user_id'])) {
-                $this->db->where('p.user_id', $filters['user_id']);
+            if (isset($filters['author_id'])) {
+                $this->db->where('p.user_id', $filters['author_id']);
             }
             if (isset($filters['search'])) {
+                $search = $filters['search'];
                 $this->db->group_start();
-                $this->db->like('p.title', $filters['search']);
-                $this->db->or_like('p.content', $filters['search']);
-                $this->db->or_like('p.excerpt', $filters['search']);
+                $this->db->like('p.title', $search);
+                $this->db->or_like('p.content', $search);
+                $this->db->or_like('c.name', $search);
+                $this->db->or_like('t.name', $search);
                 $this->db->group_end();
             }
         }
         
+        $this->db->group_by('p.id');
         $this->db->order_by('p.created_at', 'DESC');
         
         if ($limit) {
@@ -50,30 +56,38 @@ class Post_model extends CI_Model {
         return $this->get_all_posts($limit, $offset, $filters);
     }
 
-    public function count_posts($filters = array()) {
-        $this->db->from('posts');
+    public function count_posts($filters = []) {
+        $this->db->select('COUNT(DISTINCT p.id) as count');
+        $this->db->from('posts p');
+        $this->db->join('categories c', 'c.id = p.category_id', 'left');
+        $this->db->join('users u', 'u.id = p.user_id', 'left');
+        $this->db->join('post_tags pt', 'pt.post_id = p.id', 'left');
+        $this->db->join('tags t', 't.id = pt.tag_id', 'left');
         
-        // Apply filters if provided
+        // Apply filters
         if (!empty($filters)) {
             if (isset($filters['status'])) {
-                $this->db->where('status', $filters['status']);
+                $this->db->where('p.status', $filters['status']);
             }
             if (isset($filters['category_id'])) {
-                $this->db->where('category_id', $filters['category_id']);
+                $this->db->where('p.category_id', $filters['category_id']);
             }
-            if (isset($filters['user_id'])) {
-                $this->db->where('user_id', $filters['user_id']);
+            if (isset($filters['author_id'])) {
+                $this->db->where('p.user_id', $filters['author_id']);
             }
             if (isset($filters['search'])) {
+                $search = $filters['search'];
                 $this->db->group_start();
-                $this->db->like('title', $filters['search']);
-                $this->db->or_like('content', $filters['search']);
-                $this->db->or_like('excerpt', $filters['search']);
+                $this->db->like('p.title', $search);
+                $this->db->or_like('p.content', $search);
+                $this->db->or_like('c.name', $search);
+                $this->db->or_like('t.name', $search);
                 $this->db->group_end();
             }
         }
         
-        return $this->db->count_all_results();
+        $result = $this->db->get()->row();
+        return $result->count;
     }
 
     public function get_post($id) {

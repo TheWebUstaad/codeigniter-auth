@@ -5,9 +5,9 @@
 <div class="container-fluid py-5 dashboard-container">
     <div class="d-flex align-items-center justify-content-between mb-5">
         <h1 class="display-6 fw-bold text-dark-blue">
-            <i class="fas fa-grip-vertical me-3 text-primary icon-fade-in"></i>Dashboard Overview
+            <i class="fas fa-grip-vertical me-3 text-primary"></i>Dashboard Overview
         </h1>
-        <button class="btn btn-primary btn-lg shadow-sm animate-button">
+        <button class="btn btn-primary btn-lg shadow-sm">
             <i class="fas fa-chart-line me-2"></i> View Analytics
         </button>
     </div>
@@ -17,33 +17,36 @@
             <div class="card welcome-card shadow-lg border-0 rounded-4 overflow-hidden">
                 <div class="card-body p-5 d-flex align-items-center">
                     <div class="flex-shrink-0 me-5">
-                        <div class="welcome-avatar bg-gradient-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-lg animate-pop-in">
-                            <i class="fas fa-user fa-4x"></i>
+                        <div class="welcome-avatar bg-gradient-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-lg">
+                            <i class="fas fa-user fa-1x"></i>
                         </div>
                     </div>
                     <div class="flex-grow-1">
-                        <h2 class="display-5 fw-bold text-dark-blue mb-3 animate-slide-right">Hello, <span class="text-primary"><?php echo $user_info['username']; ?></span>!</h2>
-                        <p class="lead mb-3 text-secondary animate-fade-in">
-                            You're currently logged in as a
+                        <h2 class="display-5 fw-bold text-dark-blue mb-3">Hello, <span class="text-primary"><?php echo $user_info['username']; ?></span>!</h2>
+                        <p class="lead mb-3 text-secondary">
+                            You're currently logged in as a 
                             <?php
                             $badge_class = 'bg-primary';
                             $role_icon = 'fas fa-user';
-                            if ($user_info['role_name'] === 'Admin') {
-                                $badge_class = 'bg-danger';
-                                $role_icon = 'fas fa-shield-alt';
-                            } elseif ($user_info['role_name'] === 'Editor') {
-                                $badge_class = 'bg-success';
-                                $role_icon = 'fas fa-feather-alt';
-                            } elseif ($user_info['role_name'] === 'User') {
-                                $badge_class = 'bg-info';
-                                $role_icon = 'fas fa-user-circle';
-                            }
+                            
+                            if (isset($user_info['role_name'])) {
+                                if ($user_info['role_name'] === 'Admin') {
+                                    $badge_class = 'bg-danger';
+                                    $role_icon = 'fas fa-shield-alt';
+                                } elseif ($user_info['role_name'] === 'Editor') {
+                                    $badge_class = 'bg-success';
+                                    $role_icon = 'fas fa-feather-alt';
+                                } elseif ($user_info['role_name'] === 'User') {
+                                    $badge_class = 'bg-info';
+                                    $role_icon = 'fas fa-user-circle';
+                                }
                             ?>
-                            <span class="badge rounded-pill <?= $badge_class ?> px-3 py-2 fw-normal fs-6 shadow-sm animate-pop-in-late">
-                                <i class="<?= $role_icon ?> me-2"></i> <?php echo $user_info['role_name']; ?>
-                            </span>
+                                <span class="badge role-badge rounded-pill <?php echo $badge_class; ?> px-3 py-2 fw-normal fs-6 shadow-sm">
+                                    <i class="<?php echo $role_icon; ?> me-2"></i><?php echo $user_info['role_name']; ?>
+                                </span>
+                            <?php } ?>
                         </p>
-                        <p class="text-muted fs-6 mb-0 animate-fade-in-late">Explore your personalized dashboard. Your access and features are tailored to your assigned role, ensuring a secure and efficient experience.</p>
+                        <p class="text-muted fs-6 mb-0">Explore your personalized dashboard. Your access and features are tailored to your assigned role, ensuring a secure and efficient experience.</p>
                     </div>
                 </div>
             </div>
@@ -205,6 +208,7 @@
     <?php endif; ?>
 
     <!-- Real Data Analytics Section -->
+    <?php if ($user_info['role_name'] === 'Admin'): ?>
     <hr class="my-5 border-light-grey">
     <div class="row mb-4">
         <div class="col-12">
@@ -225,11 +229,9 @@
                     <h5 class="card-title fw-semibold text-dark-blue mb-0">
                         <i class="fas fa-users me-2 text-primary"></i> Users
                     </h5>
-                    <?php if ($user_info['role_name'] === 'Admin'): ?>
                     <a href="<?php echo base_url('Admin/users'); ?>" class="btn btn-sm btn-outline-primary rounded-pill">
                         <i class="fas fa-eye me-2"></i>View All
                     </a>
-                    <?php endif; ?>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -248,34 +250,25 @@
                                     <tr>
                                         <td class="ps-4">
                                             <div class="d-flex align-items-center">
-                                                <i class="fas fa-user-circle text-primary me-2"></i>
-                                                <span class="fw-medium"><?php echo $user->username; ?></span>
+                                                <span class="ms-2"><?= $user->username ?></span>
                                             </div>
                                         </td>
-                                        <td><?php echo $user->email; ?></td>
+                                        <td><?= $user->email ?></td>
                                         <td>
-                                            <?php 
-                                            $badge_class = 'bg-info';
-                                            if($user->role_name === 'Admin') {
-                                                $badge_class = 'bg-danger';
-                                            } elseif($user->role_name === 'Editor') {
-                                                $badge_class = 'bg-success';
-                                            }
-                                            ?>
-                                            <span class="badge <?php echo $badge_class; ?> rounded-pill"><?php echo $user->role_name; ?></span>
+                                            <span class="badge bg-<?= $user->role_name === 'Admin' ? 'danger' : ($user->role_name === 'Editor' ? 'success' : 'info') ?> rounded-pill">
+                                                <?= $user->role_name ?>
+                                            </span>
                                         </td>
                                         <td class="text-end pe-4">
-                                            <?php if(isset($user->active) && $user->active == 1): ?>
-                                                <span class="badge bg-success-soft text-success rounded-pill">Active</span>
-                                            <?php else: ?>
-                                                <span class="badge bg-success-soft text-success rounded-pill">Active</span>
-                                            <?php endif; ?>
+                                            <span class="badge bg-<?= $user->active ? 'success' : 'warning' ?> rounded-pill">
+                                                <?= $user->active ? 'Active' : 'Inactive' ?>
+                                            </span>
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="4" class="text-center p-4 text-muted">No users found</td>
+                                        <td colspan="4" class="text-center py-4">No users found</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -287,16 +280,14 @@
         
         <!-- Roles List -->
         <div class="col-xl-6 col-lg-6">
-            <div class="card border-0 rounded-4 shadow-sm h-100 animate-fade-in-up" style="animation-delay: 0.2s">
+            <div class="card border-0 rounded-4 shadow-sm h-100 animate-fade-in-up">
                 <div class="card-header bg-white py-4 px-4 border-bottom-0 d-flex justify-content-between align-items-center">
                     <h5 class="card-title fw-semibold text-dark-blue mb-0">
                         <i class="fas fa-user-tag me-2 text-success"></i> Roles
                     </h5>
-                    <?php if ($user_info['role_name'] === 'Admin'): ?>
                     <a href="<?php echo base_url('Admin/roles'); ?>" class="btn btn-sm btn-outline-success rounded-pill">
                         <i class="fas fa-eye me-2"></i>View All
                     </a>
-                    <?php endif; ?>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -313,33 +304,21 @@
                                     <?php foreach($roles as $role): ?>
                                     <tr>
                                         <td class="ps-4">
-                                            <?php 
-                                            $role_icon = 'fa-user';
-                                            $text_class = 'text-info';
-                                            if($role->role_name === 'Admin') {
-                                                $role_icon = 'fa-shield-alt';
-                                                $text_class = 'text-danger';
-                                            } elseif($role->role_name === 'Editor') {
-                                                $role_icon = 'fa-edit';
-                                                $text_class = 'text-success';
-                                            }
-                                            ?>
                                             <div class="d-flex align-items-center">
-                                                <i class="fas <?php echo $role_icon; ?> <?php echo $text_class; ?> me-2"></i>
-                                                <span class="fw-medium"><?php echo $role->role_name; ?></span>
+                                                <span class="ms-2"><?= $role->role_name ?></span>
                                             </div>
                                         </td>
-                                        <td><?php echo isset($role->description) ? $role->description : 'No description available'; ?></td>
+                                        <td><?= $role->description ? $role->description : 'No description' ?></td>
                                         <td class="text-end pe-4">
-                                            <span class="badge bg-light text-dark rounded-pill">
-                                                <?php echo $role->user_count; ?> users
+                                            <span class="badge bg-primary rounded-pill">
+                                                <?= $role->user_count ?>
                                             </span>
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="3" class="text-center p-4 text-muted">No roles found</td>
+                                        <td colspan="3" class="text-center py-4">No roles found</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -461,6 +440,7 @@
             </div>
         </div>
     </div>
+    <?php endif; ?>
 </div>
 
 <style>
@@ -477,7 +457,7 @@ body {
 }
 
 .text-dark-blue {
-    color: #343a40 !important; /* Darker text for headings */
+    color: #2c3e50;
 }
 .text-primary { color: #5B67C5 !important; } /* A slightly softer, modern primary blue */
 .text-success { color: #34A853 !important; } /* A fresh green */
@@ -487,7 +467,7 @@ body {
 .text-warning { color: #FBBC04 !important; }  /* A golden yellow */
 
 .bg-gradient-primary {
-    background: linear-gradient(135deg, #5B67C5, #7788D8) !important; /* Gradient for welcome avatar */
+    background: linear-gradient(45deg, var(--primary-color), #4e73df);
 }
 
 /* --- Cards General --- */
@@ -500,17 +480,29 @@ body {
 
 /* Welcome Card Specifics */
 .welcome-card {
-    background: linear-gradient(to right, #ffffff, #f0f8ff); /* Subtle gradient background */
+    background: #ffffff;
+    transition: all 0.3s ease;
 }
 
 .welcome-avatar {
-    width: 150px; /* Larger avatar */
-    height: 150px; /* Larger avatar */
-    font-size: 5rem; /* Larger icon inside */
-    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bounce effect */
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
 }
-.welcome-avatar:hover {
-    transform: scale(1.05);
+
+.role-badge {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    opacity: 1 !important;
+    position: relative;
+    z-index: 1;
+}
+
+.role-badge i {
+    display: inline-block;
+    margin-right: 0.5rem;
 }
 
 /* Feature Cards Specifics */

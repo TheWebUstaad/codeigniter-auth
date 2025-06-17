@@ -49,7 +49,7 @@
                                                     </a>
                                                 <?php endif; ?>
                                             </td>
-                                            <td><?= $post->author ?></td>
+                                            <td><?= htmlspecialchars($post->author ?? 'Unknown') ?></td>
                                             <td><?= $post->category_name ?: 'Uncategorized' ?></td>
                                             <td>
                                                 <?php if ($post->status === 'published'): ?>

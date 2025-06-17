@@ -9,18 +9,71 @@ class Admin extends CI_Controller {
         if (!$this->session->userdata('logged_in')) {
             redirect('Auth/login');
         }
-        // Check if user has 'Admin' role or 'manage_users' permission
-        if ($this->session->userdata('role_name') !== 'Admin' &&
-            !in_array('manage_users', $this->session->userdata('permissions'))) {
-            show_error('You do not have permission to access this page.', 403);
-        }
+        
+        // Load required models
         $this->load->model('User_model');
         $this->load->model('Role_model');
         $this->load->library('form_validation');
+
+        // Check if user has Admin role for dashboard access
+        if ($this->router->fetch_method() === 'index' && $this->session->userdata('role_name') !== 'Admin') {
+            redirect('Dashboard');
+        }
+        
+        // For other admin functions, check for Admin role or manage_users permission
+        if ($this->router->fetch_method() !== 'index' && 
+            $this->session->userdata('role_name') !== 'Admin' &&
+            !in_array('manage_users', $this->session->userdata('permissions'))) {
+            show_error('You do not have permission to access this page.', 403);
+        }
     }
 
     public function index() {
+        // Ensure only admin can access analytics
+        if ($this->session->userdata('role_name') !== 'Admin') {
+            show_error('You do not have permission to access this page.', 403);
+        }
+
         $data['title'] = 'Admin Panel';
+        
+        // Load required models
+        $this->load->model('Post_model');
+        $this->load->model('Category_model');
+        $this->load->model('Tag_model');
+        
+        // Basic counts
+        $data['user_count'] = $this->User_model->count_users();
+        $data['role_count'] = $this->Role_model->count_roles();
+        $data['permission_count'] = $this->Role_model->count_permissions();
+        
+        // Blog statistics
+        $data['post_count'] = $this->Post_model->count_posts(['status' => 'published']);
+        $data['draft_count'] = $this->Post_model->count_posts(['status' => 'draft']);
+        $data['category_count'] = $this->Category_model->count_categories();
+        $data['tag_count'] = $this->Tag_model->count_tags();
+        
+        // Recent activity
+        $data['recent_users'] = $this->User_model->get_recent_users(5);
+        $data['recent_posts'] = $this->Post_model->get_recent_posts(5);
+        
+        // Growth statistics
+        $data['user_growth'] = $this->User_model->get_user_growth();
+        $data['post_growth'] = $this->Post_model->get_post_growth();
+        $data['category_growth'] = $this->Category_model->get_category_growth();
+        
+        // Popular content
+        $data['popular_categories'] = $this->Category_model->get_popular_categories(5);
+        $data['popular_tags'] = $this->Tag_model->get_popular_tags(5);
+        
+        // System health
+        $data['system_info'] = [
+            'php_version' => PHP_VERSION,
+            'codeigniter_version' => CI_VERSION,
+            'server_software' => $_SERVER['SERVER_SOFTWARE'],
+            'database_driver' => $this->db->platform(),
+            'database_version' => $this->db->version()
+        ];
+        
         $this->load->view('templates/header', $data);
         $this->load->view('admin/index', $data);
         $this->load->view('templates/footer');
@@ -76,10 +129,33 @@ class Admin extends CI_Controller {
             show_404();
         }
 
+        // Prevent changing own admin role
+        if ($data['user']->id === $this->session->userdata('user_id') && 
+            $data['user']->role_name === 'Admin' && 
+            $this->input->post('role_id') && 
+            $this->input->post('role_id') != $data['user']->role_id) {
+            $this->session->set_flashdata('error', 'You cannot change your own admin role.');
+            redirect('Admin/edit_user/' . $id);
+            return;
+        }
+
+        // Check password if role is being changed
+        if ($this->input->post('role_id') && $this->input->post('role_id') != $data['user']->role_id) {
+            $admin_user = $this->User_model->get_user_by_id($this->session->userdata('user_id'));
+            $confirm_password = $this->input->post('confirm_password');
+            
+            if (!$confirm_password || !password_verify($confirm_password, $admin_user->password)) {
+                $this->session->set_flashdata('error', 'Invalid password. Role change not permitted.');
+                redirect('Admin/edit_user/' . $id);
+                return;
+            }
+        }
+
         $this->form_validation->set_rules('username', 'Username', 'required|trim|callback_unique_username['.$id.']');
         $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|callback_unique_email['.$id.']');
         $this->form_validation->set_rules('password', 'Password', 'permit_empty|min_length[6]'); // Allow empty for no change
         $this->form_validation->set_rules('role_id', 'Role', 'required|numeric');
+        $this->form_validation->set_rules('active', 'Active', 'required|numeric');
 
         if ($this->form_validation->run() == FALSE) {
             $this->load->view('templates/header', $data);
@@ -89,7 +165,8 @@ class Admin extends CI_Controller {
             $user_data = array(
                 'username' => $this->input->post('username'),
                 'email' => $this->input->post('email'),
-                'role_id' => $this->input->post('role_id')
+                'role_id' => $this->input->post('role_id'),
+                'active' => $this->input->post('active')
             );
             if (!empty($this->input->post('password'))) {
                 $user_data['password'] = $this->input->post('password');
@@ -138,6 +215,24 @@ class Admin extends CI_Controller {
             $this->session->set_flashdata('error', 'Error deleting user.');
         }
         redirect('Admin/users');
+    }
+
+    public function view_user($id) {
+        $data['title'] = 'View User';
+        $data['user'] = $this->User_model->get_user_by_id($id);
+        
+        if (empty($data['user'])) {
+            show_404();
+        }
+
+        // Get user permissions if available
+        if ($this->db->table_exists('permissions') && $this->db->table_exists('role_permissions')) {
+            $data['user_permissions'] = $this->User_model->get_user_permissions($id);
+        }
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('admin/users/view', $data);
+        $this->load->view('templates/footer');
     }
 
     // Role Management

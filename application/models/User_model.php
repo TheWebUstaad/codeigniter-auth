@@ -155,7 +155,7 @@ class User_model extends CI_Model {
     }
 
     public function get_users_with_roles($limit = null, $offset = 0) {
-        $this->db->select('users.*, roles.role_name');
+        $this->db->select('users.*, roles.role_name, COALESCE(users.active, 1) as active');
         $this->db->from('users');
         $this->db->join('roles', 'users.role_id = roles.id');
         $this->db->order_by('users.id', 'DESC');

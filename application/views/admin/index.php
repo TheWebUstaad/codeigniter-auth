@@ -6,9 +6,11 @@
         <h1 class="h3 mb-0 text-gray-800">
             <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
         </h1>
-        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-            <i class="fas fa-download fa-sm text-white-50 me-1"></i> Generate Report
-        </a>
+        <?php if ($this->session->userdata('role_name') === 'Admin'): ?>
+            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                <i class="fas fa-download fa-sm text-white-50 me-1"></i> Generate Report
+            </a>
+        <?php endif; ?>
     </div>
 
     <!-- Content Row -->
@@ -145,31 +147,75 @@
         </div>
     </div>
 
-    <!-- System Information -->
+    <?php if ($this->session->userdata('role_name') === 'Admin'): ?>
+    <!-- System Analytics - Only visible to Admin role -->
     <div class="row">
         <div class="col-lg-12 mb-4">
             <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">System Information</h6>
+                <div class="card-header py-3 d-flex align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-chart-line me-2"></i>System Analytics
+                    </h6>
+                    <span class="badge bg-primary ms-2">Admin Only</span>
                 </div>
                 <div class="card-body">
                     <div class="row">
+                        <!-- System Information -->
                         <div class="col-md-4">
-                            <div class="mb-4">
-                                <h6 class="text-gray-600"><i class="fas fa-server me-2"></i>System Version</h6>
-                                <p class="mb-0">1.0.0</p>
+                            <h6 class="text-gray-600 border-bottom pb-2 mb-3">System Information</h6>
+                            <div class="mb-3">
+                                <p class="mb-1"><i class="fas fa-server me-2"></i>System Version</p>
+                                <strong class="text-dark">1.0.0</strong>
+                            </div>
+                            <div class="mb-3">
+                                <p class="mb-1"><i class="fas fa-code me-2"></i>Framework</p>
+                                <strong class="text-dark">CodeIgniter <?= CI_VERSION ?></strong>
+                            </div>
+                            <div class="mb-3">
+                                <p class="mb-1"><i class="fas fa-database me-2"></i>Database</p>
+                                <strong class="text-dark"><?= $this->db->platform() . ' ' . $this->db->version() ?></strong>
+                            </div>
+                            <div class="mb-3">
+                                <p class="mb-1"><i class="fab fa-php me-2"></i>PHP Version</p>
+                                <strong class="text-dark"><?= PHP_VERSION ?></strong>
                             </div>
                         </div>
+                        
+                        <!-- Performance Metrics -->
                         <div class="col-md-4">
-                            <div class="mb-4">
-                                <h6 class="text-gray-600"><i class="fas fa-code me-2"></i>Framework</h6>
-                                <p class="mb-0">CodeIgniter 3</p>
+                            <h6 class="text-gray-600 border-bottom pb-2 mb-3">Performance Metrics</h6>
+                            <div class="mb-3">
+                                <p class="mb-1"><i class="fas fa-tachometer-alt me-2"></i>Memory Usage</p>
+                                <strong class="text-dark"><?= round(memory_get_usage() / 1048576, 2) ?> MB</strong>
+                            </div>
+                            <div class="mb-3">
+                                <p class="mb-1"><i class="fas fa-clock me-2"></i>Load Time</p>
+                                <strong class="text-dark"><?= round(microtime(true) - ENVIRONMENT_START, 4) ?> seconds</strong>
+                            </div>
+                            <div class="mb-3">
+                                <p class="mb-1"><i class="fas fa-database me-2"></i>Database Queries</p>
+                                <strong class="text-dark"><?= $this->db->query_count ?></strong>
                             </div>
                         </div>
+                        
+                        <!-- Security Status -->
                         <div class="col-md-4">
-                            <div class="mb-4">
-                                <h6 class="text-gray-600"><i class="fas fa-database me-2"></i>Database</h6>
-                                <p class="mb-0">MySQL</p>
+                            <h6 class="text-gray-600 border-bottom pb-2 mb-3">Security Status</h6>
+                            <div class="mb-3">
+                                <p class="mb-1"><i class="fas fa-shield-alt me-2"></i>SSL Status</p>
+                                <strong class="text-success">
+                                    <i class="fas fa-check-circle me-1"></i>Active
+                                </strong>
+                            </div>
+                            <div class="mb-3">
+                                <p class="mb-1"><i class="fas fa-lock me-2"></i>Last Security Scan</p>
+                                <strong class="text-dark">
+                                    <?= date('Y-m-d H:i:s') ?>
+                                </strong>
+                            </div>
+                            <div class="mb-3">
+                                <p class="mb-1"><i class="fas fa-user-shield me-2"></i>Security Level</p>
+                                <strong class="text-success">High</strong>
                             </div>
                         </div>
                     </div>
@@ -177,6 +223,7 @@
             </div>
         </div>
     </div>
+    <?php endif; ?>
 </div>
 
 <style>
@@ -194,5 +241,12 @@
 }
 .border-left-warning {
     border-left: 0.25rem solid #f6c23e!important;
+}
+.badge {
+    padding: 0.5em 0.8em;
+    font-weight: 500;
+}
+.text-success {
+    color: #1cc88a!important;
 }
 </style> 

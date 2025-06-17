@@ -25,20 +25,6 @@
             </div>
         </div>
         <div class="card-body">
-            <?php if($this->session->flashdata('success')): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i> <?= $this->session->flashdata('success'); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php endif; ?>
-            
-            <?php if($this->session->flashdata('error')): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-triangle me-2"></i> <?= $this->session->flashdata('error'); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php endif; ?>
-            
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="userTable" width="100%" cellspacing="0">
                     <thead class="table-light">
@@ -47,6 +33,7 @@
                             <th><i class="fas fa-user me-1"></i> Username</th>
                             <th><i class="fas fa-envelope me-1"></i> Email</th>
                             <th class="text-center"><i class="fas fa-user-tag me-1"></i> Role</th>
+                            <th class="text-center"><i class="fas fa-toggle-on me-1"></i> Status</th>
                             <th class="text-center" style="width: 150px;"><i class="fas fa-cog me-1"></i> Actions</th>
                         </tr>
                     </thead>
@@ -75,10 +62,15 @@
                                         <span class="badge <?= $badge_class ?>"><?= $user->role_name; ?></span>
                                     </td>
                                     <td class="text-center">
+                                        <span class="badge <?= $user->active ? 'bg-success' : 'bg-warning' ?>">
+                                            <?= $user->active ? 'Active' : 'Inactive' ?>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
                                         <a href="<?= base_url('Admin/edit_user/' . $user->id); ?>" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Edit User">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="#" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="View User">
+                                        <a href="<?= base_url('Admin/view_user/' . $user->id); ?>" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="View User">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <?php if ($user->role_name !== 'Admin' || $this->session->userdata('user_id') != $user->id): ?>
@@ -91,7 +83,7 @@
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" class="text-center py-3">
+                                <td colspan="6" class="text-center py-3">
                                     <div class="text-muted">
                                         <i class="fas fa-info-circle me-1"></i> No users found
                                     </div>
