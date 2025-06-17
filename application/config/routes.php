@@ -62,3 +62,29 @@ $route['translate_uri_dashes'] = FALSE;
 $route['login'] = 'Auth/login';
 $route['logout'] = 'Auth/logout';
 $route['register'] = 'Auth/register'; // If you allow user registration
+
+// Blog routes
+$route['blog'] = 'Blog/index';
+$route['blog/page/(:num)'] = 'Blog/index/$1';
+$route['blog/view/(:any)'] = 'Blog/view/$1';
+$route['blog/category/(:any)'] = 'Blog/category/$1';
+$route['blog/category/(:any)/page/(:num)'] = 'Blog/category/$1/$2';
+$route['blog/tag/(:any)'] = 'Blog/tag/$1';
+$route['blog/tag/(:any)/page/(:num)'] = 'Blog/tag/$1/$2';
+$route['blog/search'] = 'Blog/search';
+
+// Admin Blog routes
+$route['admin/blog'] = 'Admin_Blog/posts';
+$route['admin/blog/posts'] = 'Admin_Blog/posts';
+$route['admin/blog/posts/(:num)'] = 'Admin_Blog/posts/$1';
+$route['admin/blog/create'] = 'Admin_Blog/create_post';
+$route['admin/blog/edit/(:num)'] = 'Admin_Blog/edit_post/$1';
+$route['admin/blog/delete/(:num)'] = 'Admin_Blog/delete_post/$1';
+$route['admin/blog/categories'] = 'Admin_Blog/categories';
+$route['admin/blog/categories/create'] = 'Admin_Blog/create_category';
+$route['admin/blog/categories/edit/(:num)'] = 'Admin_Blog/edit_category/$1';
+$route['admin/blog/categories/delete/(:num)'] = 'Admin_Blog/delete_category/$1';
+$route['admin/blog/tags'] = 'Admin_Blog/tags';
+$route['admin/blog/tags/create'] = 'Admin_Blog/create_tag';
+$route['admin/blog/tags/edit/(:num)'] = 'Admin_Blog/edit_tag/$1';
+$route['admin/blog/tags/delete/(:num)'] = 'Admin_Blog/delete_tag/$1';
